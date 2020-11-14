@@ -1,0 +1,11 @@
+---
+- name: add accounting group
+  group:
+    name: accounting
+    gid: 3000
+    state: present
+- name: add finance group
+  group:
+    name: finance
+    gid: 3001
+    state: present

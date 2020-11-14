@@ -1,0 +1,24 @@
+---
+# createMultiepleUser.yml
+# create multiple users
+- name: create user
+  hosts: all
+#  remote_user: lnxcfg 
+#  become: true
+#  become_method: sudo
+  become_user: root
+  tasks:
+        - name: include addUsers.yml
+          include_vars:
+            file: addUser.yaml
+            name: users
+        - name: create a user
+          user:
+            name: "{{ item.value.login }}"  #login id
+            comment: "{{ item.value.gecos }}"
+            shell: "{{ item.value.shell }}"
+            password: "{{ item.value.password }}"
+            groups: "{{ item.value.supplementalGroups }}"
+            append: yes 
+            update_password: always 
+          loop: "{{ lookup('dict', users) }}"

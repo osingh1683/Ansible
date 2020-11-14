@@ -1,0 +1,55 @@
+--- 
+- 
+  args: 
+     warn: false
+
+  changed_when: "updates.stdout_lines | length > 0"
+  name: "check packages for updates"
+  register: updates
+  shell: "yum list updates | awk 'f;/Updated Packages/{f=1;}' | awk '{ print $1 }'"
+- 
+  debug: 
+    msg: |-
+        Found {{ updates.stdout_lines | length }} packages to be updated:
+        
+        {{ updates.stdout }}
+  name: "display count"
+- 
+  block: 
+    - 
+      name: "install updates using yum"
+      yum: 
+        name: "*"
+        state: latest
+    - 
+      name: "install yum-utils"
+      package: 
+        name: yum-utils
+    - 
+      changed_when: false
+      failed_when: false
+      name: "check if reboot is required"
+      register: reboot_required
+      shell: "needs-restarting -r"
+  when: "updates.stdout_lines | length > 0"
+- 
+  block: 
+    - 
+      async: 1
+      changed_when: false
+      ignore_errors: true
+      name: "reboot the server if required"
+      poll: 0
+      shell: "sleep 3; reboot"
+    - 
+      name: "wait for server to come back after reboot"
+      register: reboot_result
+      wait_for_connection: 
+        delay: 20
+        timeout: 600
+    - 
+      debug: 
+        msg: "The system rebooted in {{ reboot_result.elapsed }} seconds."
+      name: "reboot time"
+  when: "updates.stdout_lines | length > 0 and reboot_required.rc != 0"
+

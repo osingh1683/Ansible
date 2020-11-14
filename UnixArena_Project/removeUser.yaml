@@ -1,0 +1,21 @@
+---
+# removeUser.yml
+# remove a user
+- name: remove user
+  hosts: all
+#  remote_user: lnxcfg 
+#  become: true
+#  become_method: sudo
+  become_user: root
+  vars:
+    login:   'dbuser01'
+  tasks:
+        - name: remove a user
+          user:
+            name: "{{ login }}"
+            state: absent
+            remove: yes #remove home directory
+        - name: Remove sudoers file
+          file:
+            path: "/etc/sudoers.d/{{ login }}"
+            state: absent

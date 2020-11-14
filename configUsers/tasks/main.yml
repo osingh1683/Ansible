@@ -1,0 +1,5 @@
+---
+# tasks file for configUsers
+#
+- include_tasks: createGroups.yml
+- include_tasks: configUsers.yml

@@ -1,0 +1,72 @@
+---
+# createPartitionAndLVM.yml
+# Creates a partion / Logical Volume / Directory / Mounts directory 
+- name: Create Partition And LVM 
+  hosts: all
+#  remote_user: lnxcfg
+#  become: true
+#  become_method: sudo
+  become_user: root
+# Define variables
+  vars:
+    device:           '/dev/sdb'
+    volumeGroup:      'vg_learn_ansible'
+    logicalVolume:    'lv_learn_ansible'
+    directoryPath:    '/var/learn_ansible'
+    size:             '100%FREE'
+    filesystemDevice: "/dev/{{ volumeGroup }}/{{ logicalVolume }}"
+    fstype:           'xfs'
+    directoryOwner:   'root' #put in what ever users you need
+    directoryGroup:   'root' #put in what ever group you need
+    directoryMode:    '0755'        
+    mountOptions:     'defaults'
+  tasks:
+        - name: Create Partion
+          # Using gpt partition type.  Creating LVM based partition.
+          parted:
+            device: "{{ device }}"
+            number: 1
+            label: gpt
+            part_type: primary 
+            flags: [ lvm ]
+            state: present
+        - name: Create LVM volume group
+          # Create Physical Volume and Volume Group
+          lvg:
+             pvs: "{{ device }}1" 
+             state: present
+             vg: "{{ volumeGroup }}"
+        
+        - name: Create LVM logical volume
+          # Create Logical Volume
+          lvol:
+            vg: "{{ volumeGroup }}"
+            lv: "{{ logicalVolume }}"
+            size: "{{ size }}"
+        - name: Create Filesystem
+          # Create filesystem
+          filesystem:
+            fstype: "{{ fstype }}"
+            dev: "{{ filesystemDevice }}"
+        - name: Create Directory
+          # Create filesystem directory
+          file:
+             path: "{{ directoryPath }}" 
+             state: directory
+        - name: Mount directory to LVM
+          # This will also add to /etc/fstab 
+          mount:
+            path: "{{ directoryPath }}"
+            src: "{{ filesystemDevice }}" 
+            fstype: "{{ fstype }}"
+            opts: "{{ mountOptions }}" 
+            state: mounted
+        - name: Change permission on newly created directory
+          # Change permissions on newly created and mounted
+          # filesystem
+          file:
+             owner: "{{ directoryOwner }}"
+             group: "{{ directoryGroup }}"
+             mode: "{{ directoryMode }}" 
+             recurse: yes
+             path: "{{ directoryPath }}"

@@ -1,0 +1,20 @@
+---
+# vars file for configUsers
+# User to modify
+users:
+  user1:
+    login: 'linuxuser1'
+    uid:   '12001'
+    group: 'users'
+    supplementalGroups: 'accounting,finance'
+    gecos: 'Linux User One Account'
+    shell: '/bin/bash'
+    state: 'present'
+  user2:
+    login: 'linuxuser2'
+    uid:   '12002'
+    group: 'users'
+    supplementalGroups: 'accounting,finance'
+    gecos: 'Linux User Two Account'
+    shell: '/bin/bash'
+    state: 'present'

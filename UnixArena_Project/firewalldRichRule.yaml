@@ -1,0 +1,18 @@
+---
+# firewalldRichRule.yml
+# use firewalld and rich rule  
+# forward port to another ip address 
+- name: forward port for port 80 
+  hosts: all
+#  remote_user: lnxcfg
+#  become: true
+#  become_method: sudo
+  become_user: root
+  tasks:
+        - name: rich rule
+          firewalld:
+              rich_rule: 'rule family="ipv4" forward-port port="80" protocol="tcp" to-port="8080" to-addr="<REDACTED>"'
+              zone: public
+              immediate: yes # this is the firewall-cmd --reload
+              permanent: true
+              state: enabled

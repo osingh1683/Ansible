@@ -1,0 +1,19 @@
+---
+# configLineInFile.yml
+# modify a line in a file 
+- name: Configure line in file  
+  hosts: all
+#  remote_user: lnxcfg
+#  become: true
+#  become_method: sudo
+  become_user: root
+  vars:
+ 
+    hosts_var: "{{ ansible_default_ipv4.address }} {{ ansible_fqdn }} {{ ansible_hostname }} "
+ 
+  tasks:
+    - name: Configure line in a file
+      lineinfile:
+        path: /etc/hosts 
+        line: "{{ hosts_var }}"
+        state: present

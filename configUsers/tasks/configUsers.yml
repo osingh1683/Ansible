@@ -1,0 +1,20 @@
+---
+- name: config a user
+  user:
+    name:     "{{ item.value.login }}"  #login id
+    comment:  "{{ item.value.gecos }}"
+    shell:    "{{ item.value.shell }}"
+    uid:      "{{ item.value.uid }}"
+    group:    "{{ item.value.group }}"
+    groups:   "{{ item.value.supplementalGroups }}"
+    home:     "/home/{{ item.value.login }}"
+    password: "{{ 'changeMe' | password_hash('sha512') }}" 
+    state:    "{{ item.value.state }}"
+    append:   yes
+    remove:   yes
+    update_password: always
+  loop: "{{ lookup('dict', users) }}"
+- name: execute chage on new user - make user change password
+  command: 'chage -d 0 "{{  item.value.login }}"'
+  with_dict: "{{ users }}"
+  when: item.value.state == 'present'

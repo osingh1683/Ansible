@@ -1,0 +1,18 @@
+# create a directory and assign permissions to a user
+- name: create directory
+  hosts: all
+#  remote_user: osingh
+#  become: true
+#  become_method: sudo
+  become_user: root
+  tasks:
+        - name: add a directory
+          # set directory attributes.  
+          # using root as example user/group
+          file:
+             owner: root #put in what ever user you need
+             group: root #put in what ever group you need
+             mode: 0755
+             recurse: yes
+             path:  /var/www/ansible_directory
+             state: directory

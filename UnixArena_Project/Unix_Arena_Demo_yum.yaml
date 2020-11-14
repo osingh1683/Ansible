@@ -1,0 +1,8 @@
+--- 
+- 
+  gather_facts: true
+  hosts: all
+
+- 
+  # name: Update all package
+  yum: "name:* update_cache:yes state:latest"

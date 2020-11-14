@@ -1,0 +1,9 @@
+[Unit]
+Description = systemd-script service 
+After = network.target
+[Service]
+Type=forking
+ExecStart = /usr/local/bin/systemd-script
+ 
+[Install]
+WantedBy = multi-user.target

@@ -1,0 +1,20 @@
+---
+# createCron.yml
+# configure a simple cron inside /etc/cron.d 
+- name: create cron
+  hosts: all
+#  remote_user: lnxcfg
+#  become: true
+#  become_method: sudo
+  become_user: root
+  tasks:
+        - name: Creates a cron file under /etc/cron.d
+          cron:
+            # creates ansible_cron_date file in /etc/cron.d
+            # executes at the 10 minute of every hour
+            name: lnxcfg cron date
+            minute: '*/10'
+            user: root
+            job: "/bin/date >> /root/ansible_cron_date"
+            cron_file: ansible_cron_date
+            state: present

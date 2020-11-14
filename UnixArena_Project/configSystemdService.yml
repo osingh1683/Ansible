@@ -1,0 +1,41 @@
+---
+# configSystemdService.yml 
+# create a systemd service
+# for when CentOS 7 servers are 
+# rebooted; this is a rc.local 
+# replacement. Use a conditional 
+# statement to only execute 
+# playbook against CentOS 7 servers.
+- name: create systemd service
+  hosts: all
+#  remote_user: lnxcfg
+#  become: true
+#  become_method: sudo
+  become_user: root
+  tasks:
+     - name: configure systemd-script service block
+       block: 
+         - template:
+             src:  /var/lib/awx/projects/UnixArena_Project/systemd-script.j2
+             dest: /usr/local/bin/systemd-script
+             owner: root
+             group: root
+             mode: 0755
+         - template:
+             src:  /var/lib/awx/projects/UnixArena_Project/systemd-script.service.j2
+             dest: /etc/systemd/system/systemd-script.service
+             owner: root
+             group: root
+             mode: 0644
+         - systemd:
+             # Enable systemd service and reload the 
+             # systemd daemon. Notice the task does not 
+             # start the systemd-script service.  This
+             # is because with this service we want it 
+             # to execute only after a reboot or 
+             # system power on.
+             name: systemd-script
+             enabled: yes
+             masked: no
+             daemon_reload: yes
+       when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"

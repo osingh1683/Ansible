@@ -1,0 +1,17 @@
+---
+# performYumUpdateRebootServer.yml
+# performs yum update and reboots server
+- name: perform yum update / reboot server
+  hosts: all
+#  remote_user: lnxcfg
+#  become: true
+#  become_method: sudo
+#  become_user: root
+ 
+  tasks:
+        - name: Perform yum update of all packages
+          yum:
+            name: '*'
+            state: latest
+        - name: Reboot machine
+          reboot:
